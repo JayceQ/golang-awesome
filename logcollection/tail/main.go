@@ -7,7 +7,7 @@ import (
 )
 
 func main(){
-	filename := "./my.log"
+	filename := "my.log"
 	tails, err := tail.TailFile(filename, tail.Config{
 		ReOpen: true,
 		Follow: true,
