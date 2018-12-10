@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
+	"golang-awesome/logcollection/logagent/kafka"
 	"golang-awesome/logcollection/logagent/tail"
 )
 
@@ -24,11 +25,22 @@ func main(){
 
 	logs.Debug("load conf succ ,config:",appConfig)
 
-	err = tail.InitTail(appConfig.collectConf)
+	err = tail.InitTail(appConfig.collectConf,appConfig.chanSize)
 	if err != nil {
 		logs.Error("init tail failed ,err:%v\n",err)
 		return
 	}
+
+	logs.Debug("initialize tail success!")
+
+	err = kafka.InitKafka(appConfig.kafkaAddr)
+	if err != nil {
+		logs.Error("init kafka failed ,err:%v\n",err)
+		return
+	}
+
+	logs.Debug("initialize kafka success!")
+
 
 	logs.Debug("initialize all config success!")
 
@@ -38,4 +50,6 @@ func main(){
 		return
 	}
 	logs.Info("program exited")
+
+
 }
