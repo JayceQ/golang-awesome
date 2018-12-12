@@ -17,7 +17,7 @@ func main(){
 
 	var logger = log.New(os.Stderr, "[kafka]", log.LstdFlags)
 	sarama.Logger = logger
-	client, err := sarama.NewSyncProducer([]string{"182.61.137.53:9092"}, config)
+	client, err := sarama.NewSyncProducer([]string{"127.0.0.1:9092"}, config)
 	if err != nil{
 		logger.Println("producer close,err:",err)
 		return
