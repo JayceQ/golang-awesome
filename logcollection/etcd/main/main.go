@@ -11,7 +11,7 @@ import (
 func main() {
 
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379", "localhost:22379", "localhost:32379"},
+		Endpoints:   []string{"127.0.0.1:2379"},
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
@@ -19,7 +19,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("connect succ")
+	fmt.Println("connect success")
 	defer cli.Close()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	_, err = cli.Put(ctx, "/logagent/conf/", "sample_value")
