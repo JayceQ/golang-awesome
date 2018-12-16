@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func serverRun()(err error){
-	for{
+func serverRun() (err error) {
+	for {
 		msg := tail.GetOneLine()
 		err = sendToKafka(msg)
-		if err != nil{
-			logs.Error("send to kafka failed,err:%v",err)
+		if err != nil {
+			logs.Error("send to kafka failed,err:%v", err)
 			time.Sleep(time.Second)
 			continue
 		}
@@ -20,7 +20,7 @@ func serverRun()(err error){
 	return
 }
 
-func sendToKafka(msg *tail.TextMsg)(err error){
-	err = kafka.SendToKafka(msg.Msg,msg.Topic)
+func sendToKafka(msg *tail.TextMsg) (err error) {
+	err = kafka.SendToKafka(msg.Msg, msg.Topic)
 	return
 }
