@@ -1,4 +1,4 @@
-package SetConf
+package main
 
 import (
 	"context"

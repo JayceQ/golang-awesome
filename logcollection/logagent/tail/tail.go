@@ -15,16 +15,15 @@ const (
 
 type CollectConf struct {
 	LogPath string `json:"logpath"`
-	Topic   string	`json:"topic"`
+	Topic   string `json:"topic"`
 }
 
 type TailObj struct {
-	tail *tail.Tail
-	conf CollectConf
-	status int
+	tail     *tail.Tail
+	conf     CollectConf
+	status   int
 	exitChan chan int
 }
-
 
 type TextMsg struct {
 	Msg   string
@@ -33,27 +32,27 @@ type TextMsg struct {
 type TailObjMgr struct {
 	tailObjs []*TailObj
 	msgChan  chan *TextMsg
-	lock sync.Mutex
+	lock     sync.Mutex
 }
 
 var (
 	tailObjMgr *TailObjMgr
 )
 
-func GetOneLine()(msg *TextMsg){
+func GetOneLine() (msg *TextMsg) {
 	msg = <-tailObjMgr.msgChan
 	return
 }
 
-func UpdateConfig(confs []CollectConf)(err error){
+func UpdateConfig(confs []CollectConf) (err error) {
 	tailObjMgr.lock.Lock()
 	defer tailObjMgr.lock.Unlock()
 
-	for _, oneConf := range confs{
+	for _, oneConf := range confs {
 		var isRunning = false
-		for _,obj := range tailObjMgr.tailObjs{
+		for _, obj := range tailObjMgr.tailObjs {
 			if oneConf.LogPath == obj.conf.LogPath {
-				isRunning =true
+				isRunning = true
 				break
 			}
 		}
@@ -65,29 +64,29 @@ func UpdateConfig(confs []CollectConf)(err error){
 	}
 
 	var tailObjs []*TailObj
-	for _,obj := range tailObjMgr.tailObjs{
+	for _, obj := range tailObjMgr.tailObjs {
 		obj.status = StatusDelete
-		for _,oneConf := range confs{
-			if oneConf.LogPath == obj.conf.LogPath{
+		for _, oneConf := range confs {
+			if oneConf.LogPath == obj.conf.LogPath {
 				obj.status = StatusNormal
 				break
 			}
 		}
-		if obj.status == StatusDelete{
+		if obj.status == StatusDelete {
 			obj.exitChan <- 1
 			continue
 		}
-		tailObjs = append(tailObjs,obj)
+		tailObjs = append(tailObjs, obj)
 	}
 	tailObjMgr.tailObjs = tailObjs
 	return
 }
 
-func createNewTask(conf CollectConf){
+func createNewTask(conf CollectConf) {
 
 	obj := &TailObj{
-		conf:conf,
-		exitChan: make (chan int,1),
+		conf:     conf,
+		exitChan: make(chan int, 1),
 	}
 
 	file, e := tail.TailFile(conf.LogPath, tail.Config{
@@ -98,12 +97,12 @@ func createNewTask(conf CollectConf){
 		Poll:      true,
 	})
 
-	if e != nil{
-		logs.Error("collect filename[%s] failed ,err:%v",e)
+	if e != nil {
+		logs.Error("collect filename[%s] failed ,err:%v", e)
 		return
 	}
 	obj.tail = file
-	tailObjMgr.tailObjs = append(tailObjMgr.tailObjs,obj)
+	tailObjMgr.tailObjs = append(tailObjMgr.tailObjs, obj)
 
 	go readFromTail(obj)
 }
