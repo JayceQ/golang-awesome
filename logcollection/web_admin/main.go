@@ -10,7 +10,7 @@ import (
 )
 
 func initDb() (err error) {
-	database, err := sqlx.Open("mysql", "root:P@ssw0rd@tcp(182.61.137.53:3306)/logadmin")
+	database, err := sqlx.Open("mysql", "root:P@ssw0rd@tcp(182.61.137.53:3306)/logagent")
 	if err != nil {
 		logs.Warn("open mysql failed,", err)
 		return

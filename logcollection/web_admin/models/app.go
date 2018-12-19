@@ -10,7 +10,7 @@ type AppInfo struct {
 	AppName     string `db:"app_name"`
 	AppType     string `db:"app_type"`
 	CreateTime  string `db:"create_time"`
-	DevelopPath string `db:"develop_path"`
+	DevelopPath string `db:"dev_path"`
 	IP          []string
 }
 
@@ -23,7 +23,7 @@ func InitDb(db *sqlx.DB) {
 }
 
 func GetAllAppInfo() (appList []AppInfo, err error) {
-	err = Db.Select(&appList, "select app_id, app_name, app_type, create_time, develop_path from tbl_app_info")
+	err = Db.Select(&appList, "select app_id, app_name, app_type, create_time, dev_path from tbl_app_info")
 	if err != nil {
 		logs.Warn("Get All App Info failed, err:%v", err)
 		return

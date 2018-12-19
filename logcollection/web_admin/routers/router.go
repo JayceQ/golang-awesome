@@ -8,4 +8,5 @@ import (
 func init() {
 	beego.Router("/index", &AppController.AppController{}, "*:AppList")
 	beego.Router("/app/list", &AppController.AppController{}, "*:AppList")
+	beego.Router("/hello", &AppController.AppController{}, "*:TestHello")
 }
