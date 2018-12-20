@@ -30,6 +30,12 @@ func (a *AppController) AppList(){
 	a.TplName = "app/index.html"
 }
 
-func (a *AppController) TestHello(){
-	a.Ctx.WriteString("hello world")
+
+func (a *AppController) TestRestful(){
+	appList, err := models.GetAllAppInfo()
+	if err != nil{
+		logs.Warn("get appInfo failed ,err:",err)
+	}
+	a.Data["json"] = map[string]interface{}{"success": 200, "data": appList}
+	a.ServeJSON()
 }
