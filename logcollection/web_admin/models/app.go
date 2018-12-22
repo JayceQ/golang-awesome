@@ -6,11 +6,11 @@ import (
 )
 
 type AppInfo struct {
-	AppId       int    `db:"app_id"`
-	AppName     string `db:"app_name"`
-	AppType     string `db:"app_type"`
-	CreateTime  string `db:"create_time"`
-	DevelopPath string `db:"dev_path"`
+	AppId       int    `db:"app_id" json:"appId""`
+	AppName     string `db:"app_name" json:"appName"`
+	AppType     string `db:"app_type" json:"appType"`
+	CreateTime  string `db:"create_time" json:"createTime"`
+	DevelopPath string `db:"dev_path" json:"developPath"`
 	IP          []string
 }
 

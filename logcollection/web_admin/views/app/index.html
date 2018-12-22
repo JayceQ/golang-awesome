@@ -1,3 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>首页</title>
+    <link rel="stylesheet" href="../../static/css/layui.css">
+</head>
+<body class="layui-layout-body">
 <div>
-    项目列表
+    <table lay-filter="appList" lay-data="{id: 'idTest'}">
+        <thead>
+        <tr>
+            <th lay-data="{field:'',type:'checkbox', fixed: 'left'}"></th>
+            <th lay-data="{field:'appId',width:100}">项目ID</th>
+            <th lay-data="{field:'appName',width:120}">项目名称</th>
+            <th lay-data="{field:'appType',width:120}">项目类型</th>
+            <th lay-data="{field:'createTime',width:150}">创建时间</th>
+            <th lay-data="{field:'developPath',style:'background-color:#5FB878;color:#fff;'}">部署路径</th>
+            <th lay-data="{fixed: 'right',toolbar: '#barDemo', width:150}">部署路径</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .applist}}
+            <tr>
+                <td></td>
+                <td>{{.AppId}}</td>
+                <td>{{.AppName}}</td>
+                <td>{{.AppType}}</td>
+                <td>{{.CreateTime}}</td>
+                <td>{{.DevelopPath}}</td>
+                <td></td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
 </div>
+
+<script src="../../static/js/layui.all.js"></script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script>
+    let table = layui.table;
+
+    //转换静态表格
+    table.init('appList', {
+        limit: 10
+    });
+
+    table.on('row(appList)',function (d) {
+        console.log(d.data);
+    })
+
+    table.on('tool(appList)', function(obj){
+        let data = obj.data;
+        if(obj.event === 'del'){
+            layer.confirm('真的删除行么', function(index){
+                obj.del();
+                layer.close(index);
+            });
+        } else if(obj.event === 'edit'){
+            layer.prompt({
+                formType: 2
+                ,value: data.email
+            }, function(value, index){
+                obj.update({
+                    email: value
+                });
+                layer.close(index);
+            });
+        }
+    });
+
+    let checkStatus = table.checkStatus('idTest');
+    console.log(checkStatus);
+</script>
+</body>
+</html>
