@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	elastic "gopkg.in/olivere/elastic.v5"
 )
@@ -14,6 +16,7 @@ type LogMessage struct {
 
 var (
 	esClient *elastic.Client
+	count int
 )
 
 func initES(addr string) (err error) {
@@ -51,13 +54,14 @@ func sendToES(topic string, data []byte) (err error) {
 	msg := &LogMessage{}
 	msg.Topic = topic
 	msg.Message = string(data)
-
+	count++
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
 	_, err = esClient.Index().
 		Index(topic).
 		Type(topic).
-		//Id(fmt.Sprintf("%d", i)).
-		BodyJson(msg).
-		Do()
+		Id(fmt.Sprintf("%d", count)).
+		BodyJson(msg).Do(ctx)
 	if err != nil {
 		// Handle error
 		panic(err)

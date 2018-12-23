@@ -70,3 +70,23 @@ func CreateApp(info *AppInfo)(err error){
 
 	return
 }
+
+
+func GetIPInfoByName(appName string) (iplist []string, err error) {
+
+	var appId []int
+	err = Db.Select(&appId, "select app_id from tbl_app_info where app_name=?", appName)
+	if err != nil || len(appId) == 0 {
+		logs.Warn("select app_id failed, Db.Exec error:%v", err)
+		return
+	}
+
+	err = Db.Select(&iplist, "select ip from tbl_app_ip where app_id=?", appId[0])
+	if err != nil {
+		logs.Warn("Get All App Info failed, err:%v", err)
+		return
+	}
+
+	logs.Warn("get appId ",iplist)
+	return
+}

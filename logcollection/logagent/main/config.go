@@ -69,17 +69,17 @@ func loadConf(confType string, filename string) (err error) {
 		return
 	}
 
-	appConfig.etcdAddr= conf.String("etcd::addr")
-	if len(appConfig.etcdAddr) == 0 {
-		err = fmt.Errorf("invalid etcd addr")
-		return
-	}
+	//appConfig.etcdAddr= conf.String("etcd::addr")
+	//if len(appConfig.etcdAddr) == 0 {
+	//	err = fmt.Errorf("invalid etcd addr")
+	//	return
+	//}
 
-	appConfig.etcdKey= conf.String("etcd::configKey")
-	if len(appConfig.etcdKey) == 0 {
-		err = fmt.Errorf("invalid etcd key")
-		return
-	}
+	//appConfig.etcdKey= conf.String("etcd::configKey")
+	//if len(appConfig.etcdKey) == 0 {
+	//	err = fmt.Errorf("invalid etcd key")
+	//	return
+	//}
 
 	err = loadCollectConf(conf)
 	if err != nil {

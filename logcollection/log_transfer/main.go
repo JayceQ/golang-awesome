@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	err := initConfig("ini", "./conf/log_transfer.conf")
+	err := initConfig("ini", "./log_transfer.conf")
 	if err != nil {
 		panic(err)
 		return

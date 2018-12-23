@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>项目申请</title>
+    <link rel="stylesheet" href="../../static/css/layui.css">
+    <style>
+        .layui-input{
+            width: 50%;
+        }
+    </style>
+</head>
+<body class="layui-layout-body">
+<div>
+    <div>
+        <form class="layui-form" action="/log/create">
+            <div class="layui-form-item">
+                <label class="layui-form-label">项目名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="appName" lay-verify="title" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">日志路径</label>
+                <div class="layui-input-block">
+                    <input type="text" name="logPath" lay-verify="title" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">TOPIC</label>
+                <div class="layui-input-block">
+                    <input type="text" name="topic" lay-verify="title" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="appInfoSubmit">提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="../../static/js/layui.all.js"></script>
+<script>
+    let form = layui.form;
+</script>
+</body>
+</html>

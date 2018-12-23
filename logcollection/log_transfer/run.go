@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/astaxie/beego/logs"
+	"time"
 )
 
 func run() (err error) {
+	fmt.Println(kafkaClient)
 
 	partitionList, err := kafkaClient.client.Partitions(kafkaClient.topic)
 	if err != nil {
@@ -25,16 +28,19 @@ func run() (err error) {
 			kafkaClient.wg.Add(1)
 			for msg := range pc.Messages() {
 				logs.Debug("Partition:%d, Offset:%d, Key:%s, Value:%s", msg.Partition, msg.Offset, string(msg.Key), string(msg.Value))
+				fmt.Println("Partition:%d, Offset:%d, Key:%s, Value:%s", msg.Partition, msg.Offset, string(msg.Key), string(msg.Value))
 				//fmt.Println()
 				err = sendToES(kafkaClient.topic, msg.Value)
 				if err != nil {
 					logs.Warn("send to es failed, err:%v", err)
 				}
 			}
+			fmt.Println(1)
 			kafkaClient.wg.Done()
 		}(pc)
 	}
 
+	time.Sleep(time.Hour)
 	kafkaClient.wg.Wait()
 	return
 }
