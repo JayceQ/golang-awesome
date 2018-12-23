@@ -30,3 +30,43 @@ func GetAllAppInfo() (appList []AppInfo, err error) {
 	}
 	return
 }
+
+func CreateApp(info *AppInfo)(err error){
+
+	tx, err := Db.Begin()
+	if err != nil{
+		logs.Warn("createApp failed, Db.Begin error: %v",err)
+		return
+	}
+
+	//事务提交或者回滚
+	defer func(){
+		if err != nil{
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+
+	result, err := tx.Exec("insert into tbl_app_info(app_name,app_type,dev_path) values (?,?,?)",
+		info.AppName, info.AppType, info.DevelopPath)
+	if err != nil{
+		logs.Warn("insert into tbl_app_info failed ,err:%v",err)
+		return
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil{
+		logs.Warn("get lastInsertId failed, err:%v",err)
+		return
+	}
+	for _,ip := range info.IP{
+		_, err = tx.Exec("insert into tbl_app_ip (app_id,ip) values (?,?)", id, ip)
+		if err != nil {
+			logs.Warn("insert into app_tbl_ip failed, err%v",err)
+		}
+		return
+	}
+
+	return
+}
