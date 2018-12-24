@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/astaxie/beego/logs"
-	"time"
 )
 
 func run() (err error) {
@@ -24,8 +23,8 @@ func run() (err error) {
 			return
 		}
 		defer pc.AsyncClose()
+		kafkaClient.wg.Add(1)
 		go func(pc sarama.PartitionConsumer) {
-			kafkaClient.wg.Add(1)
 			for msg := range pc.Messages() {
 				logs.Debug("Partition:%d, Offset:%d, Key:%s, Value:%s", msg.Partition, msg.Offset, string(msg.Key), string(msg.Value))
 				fmt.Println("Partition:%d, Offset:%d, Key:%s, Value:%s", msg.Partition, msg.Offset, string(msg.Key), string(msg.Value))
@@ -40,7 +39,7 @@ func run() (err error) {
 		}(pc)
 	}
 
-	time.Sleep(time.Hour)
+	//time.Sleep(time.Hour)
 	kafkaClient.wg.Wait()
 	return
 }

@@ -89,10 +89,10 @@ func SetLogConfToEtcd(etcdKey string,info *LogInfo)(err error){
 		logConfArr,
 		tail.CollectConf{
 			LogPath:info.LogPath,
-			Topic:info.LogPath,
+			Topic:info.Topic,
 		},
 	)
-
+	logs.Warn("etcdctl:",etcdKey)
 	bytes, err := json.Marshal(logConfArr)
 	if err != nil {
 		logs.Warn("marshal log conf failed, err%v",err)

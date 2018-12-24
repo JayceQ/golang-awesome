@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego/logs"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/mvcc/mvccpb"
 	"golang-awesome/logcollection/logagent/tail"
-	"strings"
 	"time"
 )
 
@@ -21,7 +19,7 @@ var (
 	etcdClient *EtcdClient
 )
 
-func initEtcd(addr,key string)(collectConf []tail.CollectConf,err error){
+func initEtcd(addr,key string)(collectConf tail.CollectConf,err error){
 	client, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{"localhost:2379", "localhost:22379", "localhost:32379"},
 		DialTimeout: 5 * time.Second,
@@ -36,23 +34,25 @@ func initEtcd(addr,key string)(collectConf []tail.CollectConf,err error){
 		client:client,
 	}
 
-	if strings.HasSuffix(key,"/") == false {
-		key = key + "/"
-	}
+	//if strings.HasSuffix(key,"/") == false {
+	//	key = key + "/"
+	//}
 
-	for _,ip := range localIPArray{
-		etcdKey := fmt.Sprintf("%s%s", key, ip)
-		etcdClient.keys = append(etcdClient.keys, etcdKey)
+	//for _,ip := range localIPArray{
+		//etcdKey := fmt.Sprintf("%s%s", key, ip)
+		//etcdKey := fmt.Sprintf("%s", key)
+		etcdClient.keys = append(etcdClient.keys, key)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		resp, err := client.Get(ctx, etcdKey)
+		resp, err := client.Get(ctx, key)
 		if err != nil {
 			logs.Error("client get from etcd failed, err:%v", err)
-			continue
 		}
 		cancel()
-		logs.Debug("resp from etcd:%v", resp.Kvs)
+		logs.Debug("resps from etcd:%v", resp.Kvs)
 		for _, v := range resp.Kvs {
-			if string(v.Key) == etcdKey {
+			if string(v.Key) == key {
+				logs.Debug("v.Key:",v.Key)
+				logs.Debug("v.Value:",v.Value)
 				err = json.Unmarshal(v.Value, &collectConf)
 				if err != nil {
 					logs.Error("unmarshal failed, err:%v", err)
@@ -62,7 +62,7 @@ func initEtcd(addr,key string)(collectConf []tail.CollectConf,err error){
 				logs.Debug("log config is %v", collectConf)
 			}
 		}
-	}
+	//}
 
 	initEtcdWatcher()
 	return
@@ -71,6 +71,7 @@ func initEtcd(addr,key string)(collectConf []tail.CollectConf,err error){
 func initEtcdWatcher() {
 
 	for _, key := range etcdClient.keys {
+		logs.Debug("etcd key :" ,key)
 		go watchKey(key)
 	}
 }

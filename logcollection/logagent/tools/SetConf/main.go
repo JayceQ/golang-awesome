@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	EtcdKey = "/badme/backend/logagent/config/172.16.0.4"
+	EtcdKey = "/net/badme/logagent/config/182.61.137.53"
 )
 
 func SetLogConfToEtcd() {
