@@ -2,15 +2,15 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/astaxie/beego/logs"
 	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/mvcc/mvccpb"
 	"golang-awesome/logcollection/logagent/tail"
 	"time"
 )
 
 const (
-	EtcdKey = "mykey"
+	EtcdKey = "/logagent/conf/"
 )
 
 func initEtcdWatch(){
@@ -37,7 +37,20 @@ func watchKey(key string) {
 		for wresp := range rch {
 			logs.Debug("watch -->",wresp)
 			for _, ev := range wresp.Events {
-				fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
+				if ev.Type == mvccpb.DELETE {
+					logs.Warn("key[%s] 's config deleted", key)
+					continue
+				}
+
+				if ev.Type == mvccpb.PUT && string(ev.Kv.Key) == key {
+					//err = json.Unmarshal(ev.Kv.Value, &collectConf)
+					if err != nil {
+						logs.Error("key [%s], Unmarshal[%s], err:%v ", err)
+						getConfSucc = false
+						continue
+					}
+				}
+				logs.Debug("get config from etcd, %s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 			}
 
 			if getConfSucc {
@@ -51,27 +64,5 @@ func watchKey(key string) {
 }
 
 func main(){
-	//initEtcdWatch()
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379", "localhost:22379", "localhost:32379"},
-		DialTimeout: 5 * time.Second,
-	})
-	if err != nil {
-		fmt.Println("connect failed, err:", err)
-		return
-	}
-
-	fmt.Println("connect succ")
-	defer cli.Close()
-
-	response, err := cli.Put(context.Background(), "/logagent/conf/", "8888888")
-	fmt.Println(response)
-	for {
-		rch := cli.Watch(context.Background(), "/logagent/conf/")
-		for wresp := range rch {
-			for _, ev := range wresp.Events {
-				fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
-			}
-		}
-	}
+	initEtcdWatch()
 }
