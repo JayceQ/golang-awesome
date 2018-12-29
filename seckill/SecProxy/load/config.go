@@ -1,4 +1,4 @@
-package main
+package load
 
 import (
 	"fmt"
@@ -15,54 +15,56 @@ var (
 )
 func InitConfig()(err error){
 	redisAddr := beego.AppConfig.String("redis_addr")
+	redisPwd := beego.AppConfig.String("redis_pwd")
 	etcdAddr := beego.AppConfig.String("etcd_addr")
 
-	logs.Debug("read config success, redis addr: %v",redisAddr)
-	logs.Debug("read config success, etcd addr: %v",etcdAddr)
+	logs.Debug("read redis config success, redis addr: %v",redisAddr)
+	logs.Debug("read etcd config success, etcd addr: %v",etcdAddr)
 
 	secKillConf.RedisConf.RedisAddr = redisAddr
+	secKillConf.RedisConf.RedisPwd = redisPwd
 	secKillConf.EtcdConf.EtcdAddr = etcdAddr
 
 	if len(redisAddr) ==0 || len(etcdAddr) == 0{
-		err = fmt.Errorf("main config failed, redis[%s] or etcd[%s] is nil",redisAddr,etcdAddr)
+		err = fmt.Errorf("load config failed, redis[%s] or etcd[%s] is nil",redisAddr,etcdAddr)
 		return
 	}
 
 	redisMaxIdle, err := beego.AppConfig.Int("redis_max_idle")
 	if err != nil {
-		err = fmt.Errorf("main config failed, read redis_max_idle error: %v",err)
+		err = fmt.Errorf("load config failed, read redis_max_idle error: %v",err)
 	}
 
 	redisMaxActive, err := beego.AppConfig.Int("redis_max_active")
 	if err != nil {
-		err = fmt.Errorf("main config failed, read redis_max_active error: %v",err)
+		err = fmt.Errorf("load config failed, read redis_max_active error: %v",err)
 	}
 
 	redisIdleTimeout, err := beego.AppConfig.Int("redis_idle_timeout")
 	if err != nil {
-		err = fmt.Errorf("main config failed, read redis_idle_timeout error: %v",err)
+		err = fmt.Errorf("load config failed, read redis_idle_timeout error: %v",err)
 	}
 
 	secKillConf.RedisConf.RedisMaxIdle = redisMaxIdle
 	secKillConf.RedisConf.RedisMaxActive = redisMaxActive
-	secKillConf.RedisConf.RedisIdleTimeOut = redisIdleTimeout
+	secKillConf.RedisConf.RedisIdleTimeout = redisIdleTimeout
 
 	etcdTimeout, err := beego.AppConfig.Int("etcd_timeout")
 	if err != nil {
-		err = fmt.Errorf("main config failed, read etcd_timeout error:%v", err)
+		err = fmt.Errorf("load config failed, read etcd_timeout error:%v", err)
 		return
 	}
 
 	secKillConf.EtcdConf.Timeout = etcdTimeout
 	secKillConf.EtcdConf.EtcdSecKeyPrefix = beego.AppConfig.String("etcd_sec_key_prefix")
 	if len(secKillConf.EtcdConf.EtcdSecKeyPrefix) == 0 {
-		err = fmt.Errorf("main config failed, read etcd_sec_key error:%v", err)
+		err = fmt.Errorf("load config failed, read etcd_sec_key error:%v", err)
 		return
 	}
 
 	productKey := beego.AppConfig.String("etcd_product_key")
 	if len(productKey) == 0 {
-		err = fmt.Errorf("main config failed, read etcd_product_key error:%v", err)
+		err = fmt.Errorf("load config failed, read etcd_product_key error:%v", err)
 		return
 	}
 

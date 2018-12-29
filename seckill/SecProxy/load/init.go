@@ -1,11 +1,12 @@
-package main
+package load
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego/logs"
-	"github.com/go-redis/redis"
+	//"github.com/go-redis/redis"
+	"github.com/garyburd/redigo/redis"
 	etcd "go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/mvcc/mvccpb"
 	"golang-awesome/seckill/SecProxy/service"
@@ -13,23 +14,55 @@ import (
 )
 
 var (
-	redisClient *redis.Client
+	//redisClient *redis.Client
+	redisPool *redis.Pool
 	etcdClient *etcd.Client
 )
 
-func initRedis()(err error){
-	redisClient = redis.NewClient(&redis.Options{
-		Addr: secKillConf.RedisConf.RedisAddr,
-		Password: "123456", // no password set
-		DB:       0,  // use default DB
-	})
+//func initRedis()(err error){
+//	redisClient = redis.NewClient(&redis.Options{
+//		Addr: secKillConf.RedisConf.RedisAddr,
+//		Password: "123456", // no password set
+//		DB:       0,  // use default DB
+//	})
+//
+//	pong, err := redisClient.Ping().Result()
+//
+//	fmt.Println(pong, err)
+//
+//	if err != nil {
+//		logs.Error("ping redis failed,err :%v",err)
+//		return
+//	}
+//
+//	return
+//}
 
-	pong, err := redisClient.Ping().Result()
+func initRedis() (err error) {
+	redisPool = &redis.Pool{
+		MaxIdle:     secKillConf.RedisConf.RedisMaxIdle,
+		MaxActive:   secKillConf.RedisConf.RedisMaxActive,
+		IdleTimeout: time.Duration(secKillConf.RedisConf.RedisIdleTimeout) * time.Second,
+		Dial: func() (redis.Conn, error) {
+			redis.Dial("tcp", secKillConf.RedisConf.RedisAddr)
+			c, err := redis.Dial("tcp", secKillConf.RedisConf.RedisAddr)
+			if err != nil {
+				return nil, err
+			}
+			if _, err := c.Do("AUTH", secKillConf.RedisConf.RedisPwd); err != nil {
+				c.Close()
+				return nil, err
+			}
+			return c, err
+		},
+	}
 
-	fmt.Println(pong, err)
+	conn := redisPool.Get()
+	defer conn.Close()
 
+	_, err = conn.Do("ping")
 	if err != nil {
-		logs.Error("ping redis failed,err :%v",err)
+		logs.Error("ping redis failed, err:%v", err)
 		return
 	}
 
@@ -78,6 +111,8 @@ func initLogger() (err error){
 		fmt.Println(" marshal failed,err: ",err)
 		return
 	}
+
+	logs.SetLogger(logs.AdapterFile,string(bytes))
 	logs.SetLogger(logs.AdapterConsole,string(bytes))
 
 	return
@@ -107,26 +142,32 @@ func loadSecConf() (err error){
 func InitSecKill()(err error){
 	err = initLogger()
 	if err != nil{
-		fmt.Println("main logger failed,err: %v",err)
+		fmt.Println("load   logger failed,err: %v",err)
 		return
 	}
 
 	err = initRedis()
 	if err != nil{
-		fmt.Println("main redis failed,err: %v",err)
+		fmt.Println("load redis failed,err: %v",err)
 		return
 	}
 
 	err = initEtcd()
 	if err != nil{
-		fmt.Println("main etcd failed,err: %v",err)
+		fmt.Println("load etcd failed,err: %v",err)
 		return
 	}
 
+	err = loadSecConf()
+	if err != nil {
+		logs.Error("load sec conf failed, err:%v", err)
+		return
+	}
 	service.InitService(secKillConf)
+
 	initSecProductWatcher()
 
-	logs.Info("main sec success")
+	logs.Info("load sec success")
 	return 
 }
 
@@ -149,9 +190,9 @@ func watchSecProductKey(key string) {
 					continue
 				}
 				if ev.Type == mvccpb.PUT && string(ev.Kv.Key) == key {
-					err := json.Unmarshal(ev.Kv.Value,&secKillConf)
+					err := json.Unmarshal(ev.Kv.Value,&secProductInfo)
 					if err != nil {
-						logs.Error("key[%s],Unmarshal failed,err: %v",err)
+						logs.Error("key[%s],Unmarshal[%s] failed,err: %v",ev.Kv.Key,ev.Kv.Value,err)
 						getConfSucc = false
 						continue
 					}
