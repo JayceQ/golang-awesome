@@ -212,7 +212,8 @@ func updateSecProductInfo(confs []service.SecProductInfoConf) {
 	var tmp  = make(map[int]*service.SecProductInfoConf,1024)
 
 	for _,v :=range confs{
-		tmp[v.ProductId] = &v
+		product := v
+		tmp[v.ProductId] = &product
 	}
 
 	secKillConf.RWSecProductLock.Lock()
