@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego/logs"
-	//"github.com/go-redis/redis"
-	"github.com/garyburd/redigo/redis"
+
 	etcd "go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/mvcc/mvccpb"
 	"golang-awesome/seckill/SecProxy/service"
@@ -15,7 +14,7 @@ import (
 
 var (
 	//redisClient *redis.Client
-	redisPool *redis.Pool
+	//redisPool *redis.Pool
 	etcdClient *etcd.Client
 )
 

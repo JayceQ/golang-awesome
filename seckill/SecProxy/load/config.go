@@ -123,6 +123,12 @@ func InitConfig()(err error){
 		return
 	}
 
+	redisPwd := beego.AppConfig.String("redis_proxy2layer_pwd")
+	if len(redisPwd) == 0 {
+		err = fmt.Errorf("init config failed, read redis_layer2proxy_pwd error:%v", err)
+		return
+	}
+
 	redisMaxIdle, err = beego.AppConfig.Int("redis_proxy2layer_idle")
 	if err != nil {
 		err = fmt.Errorf("init config failed, read redis_proxy2layer_idle error:%v", err)
@@ -141,6 +147,7 @@ func InitConfig()(err error){
 		return
 	}
 
+	secKillConf.RedisProxy2LayerConf.RedisPwd= redisPwd
 	secKillConf.RedisProxy2LayerConf.RedisMaxIdle = redisMaxIdle
 	secKillConf.RedisProxy2LayerConf.RedisMaxActive = redisMaxActive
 	secKillConf.RedisProxy2LayerConf.RedisIdleTimeout = redisIdleTimeout
@@ -172,6 +179,12 @@ func InitConfig()(err error){
 		return
 	}
 
+	redisPwd = beego.AppConfig.String("redis_layer2proxy_pwd")
+	if len(redisPwd) == 0 {
+		err = fmt.Errorf("init config failed, read redis_layer2proxy_pwd error:%v", err)
+		return
+	}
+
 	redisMaxIdle, err = beego.AppConfig.Int("redis_layer2proxy_idle")
 	if err != nil {
 		err = fmt.Errorf("init config failed, read redis_layer2proxy_idle error:%v", err)
@@ -190,6 +203,7 @@ func InitConfig()(err error){
 		return
 	}
 
+	secKillConf.RedisLayer2ProxyConf.RedisPwd= redisPwd
 	secKillConf.RedisLayer2ProxyConf.RedisMaxIdle = redisMaxIdle
 	secKillConf.RedisLayer2ProxyConf.RedisMaxActive = redisMaxActive
 	secKillConf.RedisLayer2ProxyConf.RedisIdleTimeout = redisIdleTimeout
