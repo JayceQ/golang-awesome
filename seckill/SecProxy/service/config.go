@@ -29,15 +29,15 @@ type EtcdConf struct {
 
 type AccessLimitConf struct {
 	IPSecAccessLimit   int
-	UserAecAccessLimit int
+	UserSecAccessLimit int
 	IPMinAccessLimit   int
 	UserMinAccessLimit int
 }
 
 type SecProductInfoConf struct {
 	ProductId int
-	StartTime int
-	EndTime   int
+	StartTime int64
+	EndTime   int64
 	Status    int
 	Total     int
 	Left      int
@@ -68,8 +68,8 @@ type SecKillConf struct {
 	secLimitMgr *SecLimitMgr
 
 	RWBlackLock sync.RWMutex
-	WriteProxy2LayerGroutineNum int
-	ReadProxy2LayerGroutineNum int
+	WriteProxy2LayerGoroutineNum int
+	ReadProxy2LayerGoroutineNum int
 
 	SecReqChan chan*SecRequest
 	SecReqChanSize int
@@ -85,9 +85,10 @@ type SecRequest struct {
 	SecTime string
 	Nance string
 	UserId int
-	UserAuthSign time.Time
+	UserAuthSign string
+	AccessTime time.Time
 	ClientAddr string
-	ClientRefence string
+	ClientReferer string
 	CloseNotify <-chan bool `json:"-"`
 
 	ResultChan chan *SecResult `json:"-"`
