@@ -38,36 +38,36 @@ var (
 //	return
 //}
 
-func initRedis() (err error) {
-	redisPool = &redis.Pool{
-		MaxIdle:     secKillConf.RedisConf.RedisMaxIdle,
-		MaxActive:   secKillConf.RedisConf.RedisMaxActive,
-		IdleTimeout: time.Duration(secKillConf.RedisConf.RedisIdleTimeout) * time.Second,
-		Dial: func() (redis.Conn, error) {
-			redis.Dial("tcp", secKillConf.RedisConf.RedisAddr)
-			c, err := redis.Dial("tcp", secKillConf.RedisConf.RedisAddr)
-			if err != nil {
-				return nil, err
-			}
-			if _, err := c.Do("AUTH", secKillConf.RedisConf.RedisPwd); err != nil {
-				c.Close()
-				return nil, err
-			}
-			return c, err
-		},
-	}
-
-	conn := redisPool.Get()
-	defer conn.Close()
-
-	_, err = conn.Do("ping")
-	if err != nil {
-		logs.Error("ping redis failed, err:%v", err)
-		return
-	}
-
-	return
-}
+//func initRedis() (err error) {
+//	redisPool = &redis.Pool{
+//		MaxIdle:     secKillConf.RedisConf.RedisMaxIdle,
+//		MaxActive:   secKillConf.RedisConf.RedisMaxActive,
+//		IdleTimeout: time.Duration(secKillConf.RedisConf.RedisIdleTimeout) * time.Second,
+//		Dial: func() (redis.Conn, error) {
+//			redis.Dial("tcp", secKillConf.RedisConf.RedisAddr)
+//			c, err := redis.Dial("tcp", secKillConf.RedisConf.RedisAddr)
+//			if err != nil {
+//				return nil, err
+//			}
+//			if _, err := c.Do("AUTH", secKillConf.RedisConf.RedisPwd); err != nil {
+//				c.Close()
+//				return nil, err
+//			}
+//			return c, err
+//		},
+//	}
+//
+//	conn := redisPool.Get()
+//	defer conn.Close()
+//
+//	_, err = conn.Do("ping")
+//	if err != nil {
+//		logs.Error("ping redis failed, err:%v", err)
+//		return
+//	}
+//
+//	return
+//}
 
 
 func initEtcd()(err error){
@@ -146,11 +146,11 @@ func InitSecKill()(err error){
 		return
 	}
 
-	err = initRedis()
-	if err != nil{
-		fmt.Println("load redis failed,err: %v",err)
-		return
-	}
+	//err = initRedis()
+	//if err != nil{
+	//	fmt.Println("load redis failed,err: %v",err)
+	//	return
+	//}
 
 	err = initEtcd()
 	if err != nil{
