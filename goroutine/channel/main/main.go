@@ -4,17 +4,17 @@ import (
 	"fmt"
 )
 
-func send(ch chan<- int, exitChan chan struct{}) {
+func send(ch chan<- int, exitChan chan int) {
 	for i := 0; i < 10; i++ {
 		ch <- i
 	}
 
 	close(ch)
-	var a struct{}
+	a:=1
 	exitChan <- a
 }
 
-func recv(ch <-chan int, exitChan chan struct{}) {
+func recv(ch <-chan int, exitChan chan int) {
 	for {
 		v, ok := <-ch
 		if !ok {
@@ -23,7 +23,7 @@ func recv(ch <-chan int, exitChan chan struct{}) {
 		fmt.Println(v)
 	}
 
-	var a struct{}
+	a :=1
 	exitChan <- a
 	close(exitChan)
 }
@@ -32,7 +32,7 @@ func main() {
 
 	var ch chan int
 	ch = make(chan int, 10)
-	exitChan := make(chan struct{}, 2)
+	exitChan := make(chan int, 2)
 
 	go send(ch, exitChan)
 	go recv(ch, exitChan)
@@ -60,6 +60,7 @@ func main() {
 	//		break
 	//	}
 	//}
+
 	//loop:
 	//for {
 	//	select {
@@ -69,17 +70,31 @@ func main() {
 	//		}
 	//	}
 	//}
+
+	//
 	//for a := range exitChan{
 	//	fmt.Println(a)
 	//}
 
+	//for {
+	//	select {
+	//	case _, ok := <-exitChan:
+	//		if !ok {
+	//			goto exit
+	//		}
+	//	}
+	//}
+	//exit:
+
+	//channel关闭后不会阻塞，channel的len为0，从channel中取出来的值为该类型的默认值
 	for {
+		ok := false
 		select {
-		case _, ok := <-exitChan:
-			if !ok {
-				goto exit
-			}
+		case _, ok=<-exitChan:
+		}
+
+		if !ok{
+			break
 		}
 	}
-	exit:
 }
