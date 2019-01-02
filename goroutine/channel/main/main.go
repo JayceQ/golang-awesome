@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func send(ch chan<- int, exitChan chan struct{}) {
 	for i := 0; i < 10; i++ {
@@ -23,6 +25,7 @@ func recv(ch <-chan int, exitChan chan struct{}) {
 
 	var a struct{}
 	exitChan <- a
+	close(exitChan)
 }
 
 func main() {
@@ -34,16 +37,49 @@ func main() {
 	go send(ch, exitChan)
 	go recv(ch, exitChan)
 
-	for i := 0; i < 2; i++ {
-		<-exitChan
-	}
+	//for i := 0; i < 2; i++ {
+	//	i2 := <-exitChan
+	//	fmt.Print(i2)
+	//}
 
 	//if channel not close, all goroutines are asleep - deadlock
 	//for {
+	//	//_,ok := <-exitChan
+	//	//if !ok{
+	//	//	break
+	//	//}
+	//	select {
+	//	case a := <-exitChan:
+	//		fmt.Println(a)
+	//	}
+	//}
+
+	//for{
 	//	_,ok := <-exitChan
 	//	if !ok{
 	//		break
 	//	}
 	//}
+	//loop:
+	//for {
+	//	select {
+	//	case _, ok := <-exitChan:
+	//		if !ok {
+	//			break loop
+	//		}
+	//	}
+	//}
+	//for a := range exitChan{
+	//	fmt.Println(a)
+	//}
 
+	for {
+		select {
+		case _, ok := <-exitChan:
+			if !ok {
+				goto exit
+			}
+		}
+	}
+	exit:
 }
