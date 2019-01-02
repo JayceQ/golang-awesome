@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	EtcdKey = "/net/badme/seckill/backlist"
+	EtcdKey = "/net/badme/backend/seckill/product"
 )
 
 type SecInfoConf struct {

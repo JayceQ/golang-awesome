@@ -19,7 +19,7 @@ func NewSecRequest() (secRequest *SecRequest) {
 
 func SecInfoList() (data []map[string]interface{}, code int, err error) {
 	secKillConf.RWBlackLock.RLock()
-	defer secKillConf.RWBlackLock.Unlock()
+	defer secKillConf.RWBlackLock.RUnlock()
 
 	for _, v := range secKillConf.SecProductInfoMap {
 		item, _, err := SecInfoById(v.ProductId)

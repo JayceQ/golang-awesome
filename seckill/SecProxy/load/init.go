@@ -70,9 +70,10 @@ var (
 
 
 func initEtcd()(err error){
+	logs.Debug("etcd timeout: %v ",time.Duration(secKillConf.EtcdConf.Timeout) * time.Second)
 	client, err := etcd.New(etcd.Config{
 		Endpoints:   []string{secKillConf.EtcdConf.EtcdAddr},
-		DialTimeout: time.Duration(secKillConf.EtcdConf.Timeout) * time.Second,
+		DialTimeout: time.Duration(secKillConf.EtcdConf.Timeout) * time.Millisecond,
 	})
 
 	if err != nil {
