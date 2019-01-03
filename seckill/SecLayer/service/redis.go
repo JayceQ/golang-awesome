@@ -87,7 +87,7 @@ func HandleReader() {
 	for {
 		conn := secLayerContext.proxy2LayerRedisPool.Get()
 		for {
-			ret, err := conn.Do("blpop", secLayerContext.secLayerConf.Proxy2LayerRedis.RedisQueueName, 0)
+			ret, err := conn.Do("brpop", secLayerContext.secLayerConf.Proxy2LayerRedis.RedisQueueName, 0)
 			if err != nil {
 				logs.Error("pop from queue failed, err:%v", err)
 				break
@@ -154,7 +154,7 @@ func sendToRedis(res *SecResponse) (err error) {
 	}
 
 	conn := secLayerContext.layer2ProxyRedisPool.Get()
-	_, err = conn.Do("rpush", secLayerContext.secLayerConf.Layer2ProxyRedis.RedisQueueName, string(data))
+	_, err = conn.Do("lpush", secLayerContext.secLayerConf.Layer2ProxyRedis.RedisQueueName, string(data))
 	if err != nil {
 		logs.Warn("rpush to redis failed, err:%v", err)
 		return
