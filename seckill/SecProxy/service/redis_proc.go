@@ -58,7 +58,7 @@ func ReadHandle(){
 		secKillConf.UserConnMapLock.Unlock()
 		if !ok {
 			conn.Close()
-			logs.Warn("user not found: %v",userKey)
+			logs.Warn("user not found: %s",userKey)
 			continue
 		}
 		resultChan <- &result

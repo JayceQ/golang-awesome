@@ -100,15 +100,15 @@ func SecInfo(productId int) (data []map[string]interface{}, code int, err error)
 
 func SecKill(req *SecRequest) (data map[string]interface{}, code int, err error) {
 
-	secKillConf.RWSecProductLock.RLock()
-	defer secKillConf.RWSecProductLock.RUnlock()
+	//secKillConf.RWSecProductLock.RLock()
+	//defer secKillConf.RWSecProductLock.RUnlock()
 
-	err = antiSpam(req)
-	if err != nil {
-		code = ErrUserServiceBusy
-		logs.Warn("userId[%d] invalid, check failed, req[%v]", req.UserId, req)
-		return
-	}
+	//err = antiSpam(req)
+	//if err != nil {
+	//	code = ErrUserServiceBusy
+	//	logs.Warn("userId[%d] invalid, check failed, req[%v]", req.UserId, req)
+	//	return
+	//}
 
 	data, code, err = SecInfoById(req.ProductId)
 	if code != 0 {
@@ -117,7 +117,9 @@ func SecKill(req *SecRequest) (data map[string]interface{}, code int, err error)
 	}
 
 	userKey := fmt.Sprintf("%s_%s", req.UserId, req.ProductId)
+	secKillConf.RWSecProductLock.RLock()
 	secKillConf.UserConnMap[userKey] = req.ResultChan
+	secKillConf.RWSecProductLock.RUnlock()
 
 	secKillConf.SecReqChan <- req
 	ticker := time.NewTicker(time.Second * 10)

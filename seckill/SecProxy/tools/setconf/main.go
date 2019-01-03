@@ -14,14 +14,19 @@ const (
 	EtcdKey = "/net/badme/backend/seckill/product"
 )
 
-type SecInfoConf struct {
+type SecProductInfoConf = struct {
 	ProductId int
-	StartTime int
-	EndTime   int
-	Status    int
-	Total     int
-	Left      int
+	StartTime int64
+	EndTime int64
+	Status int
+	Total int
+	Left int
+	OnePersonBuyLimit int
+	BuyRate float64
+	//每秒组多能卖多少个
+	SoldMaxLimit int
 }
+
 
 func SetLogConfToEtcd() {
 	cli, err := etcdClient.New(etcdClient.Config{
@@ -36,31 +41,36 @@ func SetLogConfToEtcd() {
 	fmt.Println("connect succ")
 	defer cli.Close()
 
-	var SecInfoConfArr []SecInfoConf
-	SecInfoConfArr = append(
-		SecInfoConfArr,
-		SecInfoConf{
-			ProductId: 1029,
-			StartTime: 1505008800,
-			EndTime:   1505012400,
+	now := time.Now().Unix()
+	var SecProductInfoConfArr []SecProductInfoConf
+	SecProductInfoConfArr = append(
+		SecProductInfoConfArr,
+		SecProductInfoConf{
+			ProductId: 1001,
+			StartTime: now - 60,
+			EndTime:   now + 3600,
 			Status:    0,
-			Total:     1000,
-			Left:      1000,
+			Total:     10,
+			OnePersonBuyLimit:1,
+			SoldMaxLimit:10000,
+			BuyRate: 0.5,
 		},
 	)
-	SecInfoConfArr = append(
-		SecInfoConfArr,
-		SecInfoConf{
-			ProductId: 1027,
-			StartTime: 1505008800,
-			EndTime:   1505012400,
+	SecProductInfoConfArr = append(
+		SecProductInfoConfArr,
+		SecProductInfoConf{
+			ProductId: 1002,
+			StartTime: now - 60,
+			EndTime:   now + 3600,
 			Status:    0,
-			Total:     2000,
-			Left:      1000,
+			Total:     10,
+			OnePersonBuyLimit:1,
+			SoldMaxLimit:10000,
+			BuyRate: 0.5,
 		},
 	)
 
-	data, err := json.Marshal(SecInfoConfArr)
+	data, err := json.Marshal(SecProductInfoConfArr)
 	if err != nil {
 		fmt.Println("json failed, ", err)
 		return
