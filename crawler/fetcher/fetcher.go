@@ -13,20 +13,22 @@ import (
 )
 
 func Fetch(url string) ([]byte, error){
-	resp, err := http.Get(url)
-	if err != nil{
-		return  nil,err
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
+	var httpClient = http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
 	}
+
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK{
-		return nil,fmt.Errorf("wrong status code:%d",resp.StatusCode)
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("抓取出错了, 返回码[%d]", resp.StatusCode)
 	}
-
-	bodyReader := bufio.NewReader(resp.Body)
-	e := determineEncoding(bodyReader)
-	utf8Reader := transform.NewReader(bodyReader,e.NewDecoder())
-	return ioutil.ReadAll(utf8Reader)
+	bufBody := bufio.NewReader(resp.Body)
+	utf8Reader := transform.NewReader(bufBody, determineEncoding(bufBody).NewDecoder())
+	body, err := ioutil.ReadAll(utf8Reader)
+	return body, err
 }
 
 func determineEncoding(r *bufio.Reader) encoding.Encoding{
