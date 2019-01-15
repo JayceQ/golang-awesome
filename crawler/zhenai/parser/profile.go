@@ -22,7 +22,7 @@ var IdRe = regexp.MustCompile(`<div class="id" data-v-5b109fc3>ID：([^<]+)</div
 var Re = regexp.MustCompile(`<div class="m-btn purple" data-v-bff6f798>([^<]+)</div>`)
 
 
-func ParseProfile(contents []byte, name string) engine.ParserResult{
+func ParseProfile(contents []byte, url, name string) engine.ParserResult{
 	profile := &model.Profile{}
 	profile.Name = name
 	idsubmatch := IdRe.FindSubmatch(contents)
@@ -37,8 +37,24 @@ func ParseProfile(contents []byte, name string) engine.ParserResult{
 	profile.Income = string(submatch[6][1])
 	profile.Education = string(submatch[len(submatch)-1][1])
 
-	result := engine.ParserResult{Items: []interface{}{profile}}
-	return result
+	item := engine.Item{
+		Url:url,
+		Payload:profile,
+		Type:"zhenai",
+		Id:profile.Id,
+	}
+	rs := engine.ParserResult{}
+	rs.Items = []engine.Item{item}
+	// 取本页面内，猜你喜欢的的
+	var guessRe = regexp.MustCompile(`href="(http://album.zhenai.com/u/\w+)"[^>]*>([^<]+)</a>`)
+	ms := guessRe.FindAllSubmatch(contents, -1)
+	for _, m := range ms {
+		rs.Requests = append(rs.Requests, engine.Request{
+			Url:   string(m[1]),
+			Parse:  NewProfileParser(string(m[2])),
+		})
+	}
+	return rs
 }
 
 //func extractString(contents []byte, re *regexp.Regexp) string{
@@ -50,3 +66,21 @@ func ParseProfile(contents []byte, name string) engine.ParserResult{
 //
 //	}
 //}
+
+type ProfileParser struct{
+	userName string
+}
+
+func NewProfileParser(userName string) *ProfileParser {
+	return &ProfileParser{userName:
+		userName}
+}
+
+func (p *ProfileParser) Parse(contents []byte, url string) engine.ParserResult {
+	return ParseProfile(contents, url, p.userName)
+}
+
+func (p *ProfileParser) Serialize() (name string, args interface{}) {
+	return "ProfileParser", p.userName
+}
+

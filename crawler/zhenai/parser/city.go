@@ -7,20 +7,30 @@ import (
 
 const cityReg = `<a href="(http://album.zhenai.com/u/[0-9]+)"[^>]*>([^<]+)</a`
 
-func ParseCity(contents []byte) engine.ParserResult{
-	re := regexp.MustCompile(cityReg)
-	matches := re.FindAllSubmatch(contents, -1)
-	result := engine.ParserResult{}
+var (
+	profileRe = regexp.MustCompile(`<a href="(http://album.zhenai.com/u/\w+)"[^>]*>([^<]+)</a>`)
 
-	for _, m := range matches {
-		name := string(m[2])
-		result.Items = append(result.Items,name)
-		result.Requests = append(result.Requests,engine.Request{
-			Url:string(m[1]),
-			ParserFunc: func(c []byte) engine.ParserResult {
-				return ParseProfile(c, name)
-			},
+	cityUrlRe = regexp.MustCompile(`href="(http://www.zhenai.com/zhenghun/[^"]+)`)
+)
+
+
+func ParseCity(contents []byte,_ string) engine.ParserResult{
+	rs := engine.ParserResult{}
+
+	match := profileRe.FindAllSubmatch(contents, -1)
+	for _, m := range match {
+		rs.Requests = append(rs.Requests, engine.Request{
+			Url: string(m[1]),
+			Parse:NewProfileParser(string(m[2])),
 		})
 	}
-	return result
+
+	//取本页面其他城市链接
+	for _, m := range match {
+		rs.Requests = append(rs.Requests, engine.Request{
+			Url: string(m[1]),
+			Parse: engine.NewFuncParser(ParseCity, "ParseCity"),
+		})
+	}
+	return rs
 }

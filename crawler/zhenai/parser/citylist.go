@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"golang-awesome/crawler/engine"
 	"regexp"
 )
@@ -9,21 +8,17 @@ import (
 const cityListReg = `<a href="(http://www.zhenai.com.zhenghun/\w+)"[^>]*>([^<]+)</a>`
 
 func ParseCityList(constents []byte) engine.ParserResult{
-	re := regexp.MustCompile(cityListReg)
-	matches := re.FindAllSubmatch(constents,-1)
 	results := engine.ParserResult{}
 
-	for i, m :=range matches{
-		results.Items = append(results.Items, "City "+string(m[2]))
-		results.Requests  = append(results.Requests, engine.Request{
-			Url:string(m[1]),
-			ParserFunc:ParseCity,
+	reg := regexp.MustCompile(cityListReg)
+	matches := reg.FindAllSubmatch(constents,-1)
+
+
+	for _, m :=range matches{
+		results.Requests = append(results.Requests, engine.Request{
+			Url: string(m[1]),
+			Parse:engine.NewFuncParser(ParseCity, "ParseCity"),
 		})
-
-		if i == 10{
-			fmt.Printf("only testing %d pages, then break", i)
-		}
-
 	}
 	return results
 }
