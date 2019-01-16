@@ -21,6 +21,7 @@ func (s *QueuedScheduler) Run() {
 		for {
 			var activeRequest engine.Request
 			var activeWorker chan engine.Request
+			//如果请求队列和工作队列都不为空，则弹出请求
 			if len(requestQ) > 0 && len(workerQ) > 0 {
 				activeRequest = requestQ[0]
 				activeWorker = workerQ[0]
