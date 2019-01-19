@@ -10,9 +10,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
+// 100毫秒执行一次请求
+var rateLimiter = time.Tick(50 * time.Millisecond)
+
 func Fetch(url string) ([]byte, error){
+	//<-rateLimiter
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
 	var httpClient = http.Client{}

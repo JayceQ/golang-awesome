@@ -11,7 +11,8 @@ import (
 func ItemSaver(index string) (chan engine.Item, error){
 	ch := make(chan engine.Item, 1024)
 	client, err := elastic.NewClient(elastic.SetSniff(false),
-		elastic.SetURL("http://localhost:9200"))
+		elastic.SetURL("http://localhost:9200/"),
+		elastic.SetBasicAuth("elastic","changeme"))
 	if err != nil {
 		return nil, err
 	}

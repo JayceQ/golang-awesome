@@ -26,11 +26,12 @@ func ParseCity(contents []byte,_ string) engine.ParserResult{
 	}
 
 	//取本页面其他城市链接
-	for _, m := range match {
-		rs.Requests = append(rs.Requests, engine.Request{
-			Url: string(m[1]),
-			Parse: engine.NewFuncParser(ParseCity, "ParseCity"),
-		})
-	}
+	//match = cityUrlRe.FindAllSubmatch(contents, -1)
+	//for _, m := range match {
+	//	rs.Requests = append(rs.Requests, engine.Request{
+	//		Url: string(m[1]),
+	//		Parse: engine.NewFuncParser(ParseCity, "ParseCity"),
+	//	})
+	//}
 	return rs
 }

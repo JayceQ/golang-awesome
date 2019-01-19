@@ -7,11 +7,11 @@ import (
 
 const cityListReg = `<a href="(http://www.zhenai.com.zhenghun/\w+)"[^>]*>([^<]+)</a>`
 
-func ParseCityList(constents []byte) engine.ParserResult{
+func ParseCityList(contents []byte,_ string) engine.ParserResult{
 	results := engine.ParserResult{}
 
 	reg := regexp.MustCompile(cityListReg)
-	matches := reg.FindAllSubmatch(constents,-1)
+	matches := reg.FindAllSubmatch(contents,-1)
 
 
 	for _, m :=range matches{
