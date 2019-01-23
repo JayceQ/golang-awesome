@@ -54,13 +54,17 @@ func main(){
 	var seed []engine.Request
 	seed = []engine.Request{
 		{
-			Url:       "http://www.zhenai.com/zhenghun/henan",
-			Parse: engine.NewFuncParser(parser.ParseCity, "ParseCity"),
+			Url:"http://www.zhenai.com/zhenghun",
+			Parse: engine.NewFuncParser(parser.ParseCityList,"ParseCityList"),
 		},
-		{
-			Url:   "http://www.zhenai.com/zhenghun/beijing",
-			Parse: engine.NewFuncParser(parser.ParseCity, "ParseCity"),
-		},
+		//{
+		//	Url:       "http://www.zhenai.com/zhenghun/henan",
+		//	Parse: engine.NewFuncParser(parser.ParseCity, "ParseCity"),
+		//},
+		//{
+		//	Url:   "http://www.zhenai.com/zhenghun/beijing",
+		//	Parse: engine.NewFuncParser(parser.ParseCity, "ParseCity"),
+		//},
 	}
 
 	e := engine.ConcurrentEngine{
