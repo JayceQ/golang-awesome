@@ -9,7 +9,7 @@ func RegisterHandlers() *httprouter.Router{
 	router := httprouter.New()
 
 	router.POST("/user",CreateUser)
-	router.GET("/info",UserInfo)
+	router.GET("/info/:name",UserInfo)
 
 	return router
 }
