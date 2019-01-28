@@ -6,11 +6,11 @@ import (
 	"io"
 )
 
-func NewUUID() (string,error){
-	uuid := make([]byte,16)
+func NewUUID() (string, error) {
+	uuid := make([]byte, 16)
 	n, err := io.ReadFull(rand.Reader, uuid)
-	if n != len(uuid) ||err != nil {
-		return "",err
+	if n != len(uuid) || err != nil {
+		return "", err
 	}
 	// variant bits; see section 4.1.1
 	uuid[8] = uuid[8]&^0xc0 | 0x80
