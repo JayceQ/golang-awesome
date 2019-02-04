@@ -4,6 +4,11 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"jayce"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 func NewUUID() (string, error) {
@@ -17,4 +22,18 @@ func NewUUID() (string, error) {
 	// version 4 (pseudo-random); see section 4.1.3
 	uuid[6] = uuid[6]&^0xf0 | 0x40
 	return fmt.Sprintf("%x-%x-%x-%x-%x", uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
+}
+
+func GetCurrentTimestampSec() (ts int) {
+	ts, _ = strconv.Atoi(strconv.FormatInt(time.Now().UnixNano()/1000000000, 10))
+	return
+}
+
+func SendDeleteVideoRequest(id string) {
+	addr := jayce.GetLbAddr() + ":9001"
+	url := "http://" + addr + "video-delete-record/" + id
+	_, err := http.Get(url)
+	if err != nil {
+		log.Printf("sending delete video request error: %s", err)
+	}
 }
